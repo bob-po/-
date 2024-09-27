@@ -1,0 +1,34 @@
+#include<iostream>
+using namespace std;
+int calculateWeights(int* coins, int left, int right) {
+	int weight = 0;
+	for (int i = left; i <= right; i++) {
+		weight += coins[i];
+	}
+	return weight;
+}
+int Distinguish_coins(int* coins,int left,int right) {
+	if (right == 0 && left == 0) return 0; // 一个硬币时
+	if (right - left == 1) return calculateWeights(coins, left, left) < calculateWeights(coins, right, right) ? left : right; // 两个硬币时
+	// 三个硬币时，分三组
+	int groupsize = (right - left + 1) / 3;
+	int weights[3];
+	weights[0] = calculateWeights(coins, left, left + groupsize-1);
+	weights[1] = calculateWeights(coins, left + groupsize, left + groupsize * 2-1);
+	weights[2] = calculateWeights(coins, left + groupsize * 2, right);
+	if (weights[0] == weights[1])
+		// 假币在第三组
+		return Distinguish_coins(coins, left + groupsize * 2, right);
+	else if (weights[0] < weights[1])
+		// 假币在第一组
+		return Distinguish_coins(coins, left, left + groupsize);
+	else return Distinguish_coins(coins, left + groupsize, left + groupsize * 2); // 假币在第三组
+}
+int main()
+{
+	int coins[] = { 1,1,0,1,1,1,1,1}; // 其中0代表坏的
+	int length = 0;
+	for (auto _ : coins) length++;
+	cout << Distinguish_coins(coins, 0, length - 1) << endl;
+	return 0;
+}
